@@ -1,5 +1,7 @@
 import type { WebviewApi } from "vscode-webview";
 
+const KEY = "vstodo";
+
 /**
  * A utility wrapper around the acquireVsCodeApi() function, which enables
  * message passing and state management between the webview and extension
@@ -48,7 +50,7 @@ class VSCodeAPIWrapper {
     if (this.vsCodeApi) {
       return this.vsCodeApi.getState();
     } else {
-      const state = localStorage.getItem("vscodeState");
+      const state = localStorage.getItem(KEY) ?? '[]';
       return state ? JSON.parse(state) : undefined;
     }
   }
@@ -68,7 +70,7 @@ class VSCodeAPIWrapper {
     if (this.vsCodeApi) {
       return this.vsCodeApi.setState(newState);
     } else {
-      localStorage.setItem("vscodeState", JSON.stringify(newState));
+      localStorage.setItem(KEY, JSON.stringify(newState));
       return newState;
     }
   }

@@ -1,20 +1,27 @@
 import { vscode } from "./utilities/vscode";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import "./App.css";
+import { useEffect } from "react";
+import InputBox from "./components/InputBox";
+import TodoItem from "./components/TodoItem";
+import { useTodo } from "./contexts/TodoContext";
 
 function App() {
-  function handleHowdyClick() {
+  const { todos } = useTodo();
+
+  useEffect(() => {
     vscode.postMessage({
       command: "ready",
-      text: "Hey there partner! 🤠",
     });
-  }
+  }, []);
 
   return (
-    <main>
-      <h1>Hello World!</h1>
-      <VSCodeButton onClick={handleHowdyClick}>Howdy!</VSCodeButton>
-    </main>
+    <div className="h-screen  flex flex-col  items-center p-10 gap-5">
+      <InputBox />
+      <ul className="max-h-96 overflow-y-auto py-2 px-2">
+        {todos.map((todoItem) => (
+          <TodoItem key={todoItem.id} {...todoItem} />
+        ))}
+      </ul>
+    </div>
   );
 }
 
