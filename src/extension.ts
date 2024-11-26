@@ -1,14 +1,15 @@
-import { commands, ExtensionContext, window, Range, Position, TextEditorDecorationType } from "vscode";
-import { TodoPanel } from "./panels/TodoPanel";
+import { commands, ExtensionContext, window, Range, Position, TextEditorDecorationType, ProgressLocation } from "vscode";
 
-const getFlakyTestsForFile = (path: string) => {
-  return Promise.resolve([
-    'Math Functions >> adds two numbers',
-    'Math Functions >> divides two numbers',
-  ]);
+let flakyDecorationType: TextEditorDecorationType | undefined;
+
+const getFlakyTestsForFile = async (path: string): Promise<string[]> => {
+  await new Promise(resolve => setTimeout(resolve, 4000));
+  return [
+    'adds two numbers',
+    'divides two numbers',
+  ];
 };
 
-// Another command that marks a test as flaky.
 async function flakyMarker() {
   const activeEditor = window.activeTextEditor;
 
@@ -20,53 +21,60 @@ async function flakyMarker() {
   const document = activeEditor.document;
   const filename = document.fileName;
 
-  // Check if the file is a test file
+  console.log('filename', filename);
+
   if (!/\.(test\.js|test\.ts|test\.jsx|test\.tsx)$/.test(filename)) {
     window.showInformationMessage('No test file found.');
     return;
   }
 
-  const flakyTests = await getFlakyTestsForFile(filename);
+  const flakyTests = await window.withProgress({
+    location: ProgressLocation.Notification,
+    title: "Fetching flaky tests...",
+    cancellable: false
+  }, async () => {
+    // Perform the async operation without reporting progress increments
+    return await getFlakyTestsForFile(filename);
+  });
 
   if (flakyTests.length === 0) {
     window.showInformationMessage('No flaky tests found.');
     return;
   }
 
-  const selectedTest = await window.showQuickPick(flakyTests, {
-    placeHolder: 'Select a flaky test to mark',
-  });
+  console.log('flakyTests', flakyTests);
 
-  if (!selectedTest) {
-    return;
-  }
-
-  const [suiteName, testName] = selectedTest.split('>>').map((s) => s.trim());
-
-  // Mark the test as flaky
   const text = document.getText();
-  const testRegex = new RegExp(`describe\\(['"\`].*?${suiteName}.*?['"\`],.*?\\{[\\s\\S]*?test\\(['"\`]${testName}['"\`],`, 'g');
-  let match;
   const ranges: Range[] = [];
 
-  while ((match = testRegex.exec(text))) {
-    const testStartIndex = match.index + match[0].lastIndexOf(`test('`);
-    const testStartPos = document.positionAt(testStartIndex);
-    const testLine = testStartPos.line;
+  flakyTests.forEach(testName => {
+    const testRegex = new RegExp(`test\\(['"\`]${testName}['"\`],`);
+    const match = testRegex.exec(text);
 
-    // Ensure the line before the test exists
-    if (testLine > 0) {
-      const range = new Range(new Position(testLine - 1, 0), new Position(testLine - 1, 0));
-      ranges.push(range);
+    if (match) {
+      const testStartIndex = match.index;
+      const testStartPos = document.positionAt(testStartIndex);
+      const testLine = testStartPos.line;
+
+      if (testLine > 0) {
+        const range = new Range(new Position(testLine - 1, 0), new Position(testLine - 1, 0));
+        ranges.push(range);
+      }
     }
-  }
+  });
 
   if (ranges.length === 0) {
-    window.showInformationMessage('Test not found in the file.');
+    window.showInformationMessage('No matching tests found in the file.');
     return;
   }
 
-  const flakyDecorationType: TextEditorDecorationType = window.createTextEditorDecorationType({
+  console.log('ranges', ranges);
+
+  if (flakyDecorationType) {
+    activeEditor.setDecorations(flakyDecorationType, []);
+  }
+
+  flakyDecorationType = window.createTextEditorDecorationType({
     isWholeLine: true,
     after: {
       contentText: ' [Flaky]',
@@ -80,11 +88,12 @@ async function flakyMarker() {
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    commands.registerCommand("vscode-todo.run", () => {
-      TodoPanel.render(context.extensionUri);
-    }),
     commands.registerCommand("vscode-todo.flakyMarker", flakyMarker)
   );
 }
 
-export function deactivate() {}
+export function deactivate() {
+  if (flakyDecorationType) {
+    flakyDecorationType.dispose();
+  }
+}
