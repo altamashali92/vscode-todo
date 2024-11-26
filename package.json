@@ -19,6 +19,11 @@
         "command": "vscode-todo.run",
         "title": "Run",
         "category": "VSCode TODO"
+      },
+      {
+        "command": "vscode-todo.flakyMarker",
+        "title": "Mark as Flaky",
+        "category": "VSCode TODO"
       }
     ]
   },
