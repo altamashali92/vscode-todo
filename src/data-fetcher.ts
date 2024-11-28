@@ -3,9 +3,14 @@ import { getFlakyTests } from "./api/get-flaky-tests";
 import { FLAKY_TESTS_KEY } from "./constants";
 import { FlakyTestMap } from "./types";
 
-export let testMap: FlakyTestMap = new Map();
+export let testMap: FlakyTestMap;
 
 export async function setFlakyTestsOnInit(context: ExtensionContext) {
+  // skip if already set
+  if (testMap) {
+    return;
+  }
+
   const flakyTests = await getFlakyTests();
   testMap = flakyTests.reduce((map, res) => {
     const path = res.path;
@@ -21,7 +26,7 @@ export async function setFlakyTestsOnInit(context: ExtensionContext) {
     });
     return map;
   }, new Map());
-  context.workspaceState.update(FLAKY_TESTS_KEY, undefined);
+  // context.workspaceState.update(FLAKY_TESTS_KEY, undefined);
 }
 
 function formatTestPath(name: string): string[] {
