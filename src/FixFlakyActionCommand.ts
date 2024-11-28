@@ -6,7 +6,7 @@ export function fixFlakyActionCommand(context: ExtensionContext) {
   const supportedLanguages = ['javascript', 'typescript', 'javascriptreact', 'typescriptreact'];
   supportedLanguages.forEach((language) => {
     context.subscriptions.push(
-      languages.registerCodeLensProvider({scheme: 'file', language}, new TestCodeLensProvider())
+      languages.registerCodeLensProvider({scheme: 'file', language}, new TestCodeLensProvider(context))
     );
   });
   context.subscriptions.push(
