@@ -1,0 +1,1 @@
+export const FLAKY_TESTS_KEY = "flakyTests";
