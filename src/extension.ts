@@ -1,13 +1,20 @@
-import { commands, ExtensionContext, window, Range, Position, TextEditorDecorationType, ProgressLocation } from "vscode";
+import {
+  commands,
+  ExtensionContext,
+  window,
+  Range,
+  Position,
+  TextEditorDecorationType,
+  ProgressLocation,
+} from "vscode";
+
+import { TodoPanel } from "./panels/TodoPanel";
 
 let flakyDecorationType: TextEditorDecorationType | undefined;
 
 const getFlakyTestsForFile = async (path: string): Promise<string[]> => {
-  await new Promise(resolve => setTimeout(resolve, 4000));
-  return [
-    'adds two numbers',
-    'divides two numbers',
-  ];
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+  return ["adds two numbers", "divides two numbers"];
 };
 
 async function flakyMarker() {
@@ -21,33 +28,36 @@ async function flakyMarker() {
   const document = activeEditor.document;
   const filename = document.fileName;
 
-  console.log('filename', filename);
+  console.log("filename", filename);
 
   if (!/\.(test\.js|test\.ts|test\.jsx|test\.tsx)$/.test(filename)) {
-    window.showInformationMessage('No test file found.');
+    window.showInformationMessage("No test file found.");
     return;
   }
 
-  const flakyTests = await window.withProgress({
-    location: ProgressLocation.Notification,
-    title: "Fetching flaky tests...",
-    cancellable: false
-  }, async () => {
-    // Perform the async operation without reporting progress increments
-    return await getFlakyTestsForFile(filename);
-  });
+  const flakyTests = await window.withProgress(
+    {
+      location: ProgressLocation.Notification,
+      title: "Fetching flaky tests...",
+      cancellable: false,
+    },
+    async () => {
+      // Perform the async operation without reporting progress increments
+      return await getFlakyTestsForFile(filename);
+    }
+  );
 
   if (flakyTests.length === 0) {
-    window.showInformationMessage('No flaky tests found.');
+    window.showInformationMessage("No flaky tests found.");
     return;
   }
 
-  console.log('flakyTests', flakyTests);
+  console.log("flakyTests", flakyTests);
 
   const text = document.getText();
   const ranges: Range[] = [];
 
-  flakyTests.forEach(testName => {
+  flakyTests.forEach((testName) => {
     const testRegex = new RegExp(`test\\(['"\`]${testName}['"\`],`);
     const match = testRegex.exec(text);
 
@@ -57,18 +67,21 @@ async function flakyMarker() {
       const testLine = testStartPos.line;
 
       if (testLine > 0) {
-        const range = new Range(new Position(testLine - 1, 0), new Position(testLine - 1, 0));
+        const range = new Range(
+          new Position(testLine - 1, 0),
+          new Position(testLine - 1, 0)
+        );
         ranges.push(range);
       }
     }
   });
 
   if (ranges.length === 0) {
-    window.showInformationMessage('No matching tests found in the file.');
+    window.showInformationMessage("No matching tests found in the file.");
     return;
   }
 
-  console.log('ranges', ranges);
+  console.log("ranges", ranges);
 
   if (flakyDecorationType) {
     activeEditor.setDecorations(flakyDecorationType, []);
@@ -77,10 +90,10 @@ async function flakyMarker() {
   flakyDecorationType = window.createTextEditorDecorationType({
     isWholeLine: true,
     after: {
-      contentText: ' [Flaky]',
-      color: 'red',
-      margin: '0 0 0 1em'
-    }
+      contentText: " [Flaky]",
+      color: "red",
+      margin: "0 0 0 1em",
+    },
   });
 
   activeEditor.setDecorations(flakyDecorationType, ranges);
@@ -88,7 +101,8 @@ async function flakyMarker() {
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    commands.registerCommand("vscode-todo.flakyMarker", flakyMarker)
+    commands.registerCommand("vscode-todo.flakyMarker", flakyMarker),
+    commands.registerCommand("vscode-todo.run",() => TodoPanel.render(context.extensionUri))
   );
 }
 
