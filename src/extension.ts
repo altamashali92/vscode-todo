@@ -6,9 +6,11 @@ import {
   Position,
   TextEditorDecorationType,
   ProgressLocation,
+  languages,
 } from "vscode";
 
 import { TodoPanel } from "./panels/TodoPanel";
+import { TestCodeLensProvider } from "./TestCodeLensProvider";
 
 let flakyDecorationType: TextEditorDecorationType | undefined;
 
@@ -101,8 +103,21 @@ async function flakyMarker() {
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    commands.registerCommand("vscode-todo.flakyMarker", flakyMarker),
+    commands.registerCommand("FlakeManager.flakyMarker", flakyMarker),
     commands.registerCommand("vscode-todo.run",() => TodoPanel.render(context.extensionUri))
+  );
+
+  // code lens
+  const supportedLanguages = ['javascript', 'typescript', 'javascriptreact', 'typescriptreact'];
+  supportedLanguages.forEach((language) => {
+    context.subscriptions.push(
+      languages.registerCodeLensProvider({scheme: 'file', language}, new TestCodeLensProvider())
+    );
+  });
+  context.subscriptions.push(
+    commands.registerCommand("FlakeManager.markAsFixed", (testname: string) => {
+      window.showInformationMessage(`Marked test ${testname} as fixed.`);
+    }),
   );
 }
 

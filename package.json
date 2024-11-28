@@ -10,7 +10,10 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vscode-todo.run"
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -21,9 +24,14 @@
         "category": "VSCode TODO"
       },
       {
-        "command": "vscode-todo.flakyMarker",
+        "command": "FlakeManager.flakyMarker",
         "title": "Mark as Flaky",
-        "category": "VSCode TODO"
+        "category": "FlakeManager"
+      },
+      {
+        "command": "FlakeManager.markAsFixed",
+        "title": "Mark as Fixed",
+        "category": "FlakeManager"
       }
     ]
   },
