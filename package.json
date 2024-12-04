@@ -29,6 +29,11 @@
         "command": "FlakeManager.markAsFixed",
         "title": "Mark as Fixed",
         "category": "FlakeManager"
+      },
+      {
+        "command": "FlakeManager.detectFlakyTests",
+        "title": "Detect Flaky Tests Counts",
+        "category": "FlakeManager"
       }
     ]
   },
