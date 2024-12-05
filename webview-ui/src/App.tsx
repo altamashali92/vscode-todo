@@ -1,26 +1,73 @@
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
+// import { vscode } from "./utilities/vscode";
+// import { QuarantinedTest } from '../../src/types.ts';
+// import FlakyTestList from "./components/FlakyTestList.tsx";
+
+// const App: React.FC = () => {
+//   const [flakyTests, setFlakyTests] = useState<QuarantinedTest[]>([]);
+
+//   useEffect(() => {
+
+//     // Retreive flaky tests from webview
+//     const tests = (window as any).flakyTests as QuarantinedTest[];
+//     setFlakyTests(tests);
+
+//     // Notify the extension that webview is ready
+//     vscode.postMessage({command: 'ready'});
+
+//   }, [])
+
+
+//   return (
+//     <div className="container mx-auto p-4">
+//       <h1 className="text-2xl font-bold mb-4">Flaky Tests</h1>
+//       <FlakyTestList flakyTests={flakyTests} />
+//     </div>
+//   );
+// };
+
+// export default App;
+
+import React, { useState, useEffect } from "react";
 import { vscode } from "./utilities/vscode";
-import { QuarantinedTest } from '../../src/types.ts';
-import FlakyTestList from "./components/FlakyTestList.tsx";
+import { QuarantinedTest } from '../../src/types';
+import FlakyTestList from "./components/FlakyTestList";
 
 const App: React.FC = () => {
   const [flakyTests, setFlakyTests] = useState<QuarantinedTest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-
-    // Retreive flaky tests from webview
+    // Retrieve flaky tests from webview
     const tests = (window as any).flakyTests as QuarantinedTest[];
     setFlakyTests(tests);
+    setIsLoading(false);
 
     // Notify the extension that webview is ready
     vscode.postMessage({command: 'ready'});
 
-  }, [])
+    // Listen for updates
+    const messageListener = (event: MessageEvent) => {
+      const message = event.data;
+      switch (message.command) {
+        case 'updateTests':
+          setFlakyTests(message.tests);
+          break;
+      }
+    };
 
+    window.addEventListener('message', messageListener);
+
+    return () => window.removeEventListener('message', messageListener);
+  }, []);
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Flaky Tests</h1>
+    <div className="p-4">
+      <h1 className="text-lg font-semibold mb-4">Flaky Tests</h1>
       <FlakyTestList flakyTests={flakyTests} />
     </div>
   );
