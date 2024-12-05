@@ -38,7 +38,7 @@ export class FlakyTestsPanel {
     } else {
       const panel = vscode.window.createWebviewPanel(
         'flakyTestsPanel',
-        'Flaky Tests',
+        'Neo: IDE Insights',
         column || vscode.ViewColumn.One,
         {
           enableScripts: true,
@@ -91,7 +91,7 @@ export class FlakyTestsPanel {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';" />
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
-          <title>Flaky Tests</title>
+          <title>Neo: IDE Insights</title>
         </head>
         <body>
           <div id="root"></div>

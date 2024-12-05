@@ -24,14 +24,14 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("FlakeManager.flakyMarker", flakyMarker),
     commands.registerCommand("vscode-todo.run", () => todoListCommand(context)),
-    commands.registerCommand("FlakeManager.detectFlakyTests", async () => {
+    commands.registerCommand("FlakeManager.detectFlakyJestUnitTestsInJira", async () => {
 
       try {
         const token = process.env.SLAUTH_TOKEN!;
         const flakyTests = await getQuarantinedTests(token, 'jira', 'jest-unit');
         FlakyTestsPanel.createOrShow(context.extensionUri, flakyTests);
       } catch (error) {
-        window.showErrorMessage(`Failed to fetch flaky tests: ${error}`);
+        window.showErrorMessage(`Failed to fetch jira jest-unit flaky tests: ${error}`);
       }
 
     })
