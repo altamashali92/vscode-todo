@@ -54,7 +54,13 @@ export class FlakyTestsPanel {
     console.log("Attempting to open file:", filePath);
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
       const rootPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-      const fullPath = path.join(rootPath, 'jira', filePath);
+
+    //   TODO : Uncomment when running extension in AFM root
+    //   const fullPath = path.join(rootPath, 'jira', filePath);
+
+    // TODO: Comment later. currently assuming Jira is opened as root.  
+      const fullPath = path.join(rootPath, filePath);
+
       console.log("Full path:", fullPath);
       try {
         const document = await vscode.workspace.openTextDocument(fullPath);
