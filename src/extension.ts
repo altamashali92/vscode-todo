@@ -37,53 +37,6 @@ export async function activate(context: ExtensionContext) {
     })
   );
   fixFlakyActionCommand(context);
-
-
-  // // Handle messages from webview
-  // window.registerWebviewPanelSerializer('flakyTestsPanel', {
-  //   async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any) {
-  //     webviewPanel.webview.options = {
-  //       enableScripts: true,
-  //     };
-
-  //     webviewPanel.webview.onDidReceiveMessage(
-  //       async (message) => {
-  //         console.log("hooray! received a messsage");
-
-  //         switch (message.command) {
-  //           case 'openFile':
-  //             console.log("entered openfile block");
-
-  //             if (workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
-  //               const rootPath = workspace.workspaceFolders[0].uri.fsPath;
-  //               // const fullPath = path.join(rootPath, 'jira', message.filePath);
-  //               const fullPath = path.join(rootPath, message.filePath);
-
-  //               console.log("calculated paths", rootPath, fullPath);
-  //               try {
-  //                 const document = await workspace.openTextDocument(fullPath);
-  //                 await window.showTextDocument(document);
-  //               } catch (error) {
-
-  //                 console.log(`Failed to open file: 
-  //                   fullPath: ${fullPath}
-  //                   ${error}`);
-
-  //                 window.showErrorMessage(`Failed to open file: 
-  //                   fullPath: ${fullPath}
-  //                   ${error}`);
-  //               }
-  //             } else {
-  //               window.showErrorMessage('No workspace folder is open');
-  //             }
-  //             break;
-  //         }
-  //       },
-  //       undefined,
-  //       context.subscriptions
-  //     );
-  //   }
-  // });
 }
 
 export function deactivate() {
