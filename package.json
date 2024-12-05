@@ -31,9 +31,9 @@
         "category": "FlakeManager"
       },
       {
-        "command": "FlakeManager.detectFlakyJestUnitTestsInJira",
-        "title": "Detect Flaky Jest Unit Tests Counts in Jira",
-        "category": "FlakeManager"
+        "command": "Codelassian.detectFlakyJestUnitTestsInJira",
+        "title": "Detect Flaky Unit Tests",
+        "category": "Codelassian"
       }
     ]
   },

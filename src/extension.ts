@@ -24,7 +24,7 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     commands.registerCommand("FlakeManager.flakyMarker", flakyMarker),
     commands.registerCommand("vscode-todo.run", () => todoListCommand(context)),
-    commands.registerCommand("FlakeManager.detectFlakyJestUnitTestsInJira", async () => {
+    commands.registerCommand("Codelassian.detectFlakyJestUnitTestsInJira", async () => {
 
       try {
         const token = process.env.SLAUTH_TOKEN!;
