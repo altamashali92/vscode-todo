@@ -97,25 +97,43 @@ const FlakyTestList: React.FC<FlakyTestListProps> = ({ flakyTests }) => {
     };
 
     return (
-      <div key={node.path} className="ml-4">
-        <div 
-          className="flex items-center cursor-pointer hover:bg-gray-200 py-1"
-          onClick={node.isFile ? () => handleFileClick(node.path) : () => toggleExpand(node.path)}
-        >
-          {!node.isFile && (
-            isExpanded ? <FaChevronDown className="w-4 h-4 mr-1" /> : <FaChevronRight className="w-4 h-4 mr-1" />
+        <div key={node.path} className={`ml-4 ${!node.isFile ? 'mb-1' : ''}`}>
+          <div 
+            className={`flex items-center cursor-pointer hover:bg-[#2a2d2e] py-[3px] px-1 rounded ${
+              node.isFile ? 'text-[#cccccc]' : 'text-[#8a8a8a]'
+            }`}
+            onClick={node.isFile ? () => handleFileClick(node.path) : () => toggleExpand(node.path)}
+          >
+            {!node.isFile && (
+              <span className="w-4 h-4 flex items-center justify-center mr-1">
+                {isExpanded ? (
+                  <FaChevronDown className="w-3 h-3" />
+                ) : (
+                  <FaChevronRight className="w-3 h-3" />
+                )}
+              </span>
+            )}
+            {node.isFile ? (
+              <FaFile className="w-4 h-4 mr-2 text-[#519aba]" />
+            ) : (
+              <FaFolder className="w-4 h-4 mr-2 text-[#dcb67a]" />
+            )}
+            <span className="flex-grow text-sm">{node.name}</span>
+            <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full ml-2">
+              {node.count}
+            </span>
+          </div>
+          {!node.isFile && isExpanded && (
+            <div className="ml-2">
+              {node.children.map(child => renderTree(child))}
+            </div>
           )}
-          {node.isFile ? <FaFile className="w-4 h-4 mr-2" /> : <FaFolder className="w-4 h-4 mr-2" />}
-          <span className="flex-grow">{node.name}</span>
-          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{node.count}</span>
         </div>
-        {!node.isFile && isExpanded && node.children.map(child => renderTree(child))}
-      </div>
-    );
+      );
   };
 
   return (
-    <div className="text-sm">
+    <div className="text-sm font-normal text-[#cccccc] bg-[#1e1e1e]">
       {tree.children.map(child => renderTree(child))}
     </div>
   );
