@@ -4,13 +4,19 @@ import { QuarantinedTest } from '../../src/types';
 import FlakyTestList from "./components/FlakyTestList";
 
 const App: React.FC = () => {
-  const [flakyTests, setFlakyTests] = useState<QuarantinedTest[]>([]);
+  const [flakyTests, setFlakyTests] = useState<QuarantinedTest[]>(() => {
+    const saved = localStorage.getItem('flakyTests');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Retrieve flaky tests from webview
+    // Retrieve flaky tests from webview or localStorage
     const tests = (window as any).flakyTests as QuarantinedTest[];
-    setFlakyTests(tests);
+    if (tests && tests.length > 0) {
+      setFlakyTests(tests);
+      localStorage.setItem('flakyTests', JSON.stringify(tests));
+    }
     setIsLoading(false);
 
     // Notify the extension that webview is ready
@@ -22,6 +28,7 @@ const App: React.FC = () => {
       switch (message.command) {
         case 'updateTests':
           setFlakyTests(message.tests);
+          localStorage.setItem('flakyTests', JSON.stringify(message.tests));
           break;
       }
     };

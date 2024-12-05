@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { QuarantinedTest } from "../../../src/types";
 import { vscode } from "../utilities/vscode";
 import { FaFolder, FaFile, FaChevronRight, FaChevronDown } from "react-icons/fa6";
@@ -65,8 +65,16 @@ const FlakyTestList: React.FC<FlakyTestListProps> = ({ flakyTests }) => {
     return buildTree(flakyTests);
   }, [flakyTests]);
 
-  // Separate state for expanded nodes
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+  // Initialize state from localStorage or empty set
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('expandedNodes');
+    return saved ? new Set(JSON.parse(saved)) : new Set<string>();
+  });
+
+  // Update localStorage when expandedNodes changes
+  useEffect(() => {
+    localStorage.setItem('expandedNodes', JSON.stringify([...expandedNodes]));
+  }, [expandedNodes]);
 
   const toggleExpand = (path: string) => {
     setExpandedNodes(prev => {
